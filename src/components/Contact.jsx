@@ -14,7 +14,7 @@ export default function Contact() {
     <section
       id="contact"
       className="section-inner"
-      style={{ padding: '100px 48px 140px', maxWidth: 860, margin: '0 auto' }}
+      style={{ padding: '48px 48px 80px', maxWidth: 860, margin: '0 auto' }}
     >
       <hr className="divider" style={{ marginBottom: 64 }} />
       <div className="section-label">{t.s3label}</div>
@@ -48,7 +48,7 @@ export default function Contact() {
         className="footer-row"
         style={{ marginTop: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
       >
-        <span className="mono" style={{ fontSize: 11, color: '#2e2e32' }}>{t.footer}</span>
+        <span className="mono" style={{ fontSize: 11, color: '#555' }}>{t.footer}</span>
         <div style={{ display: 'flex', gap: 16 }}>
           <SocialLink href="https://www.linkedin.com/in/ege-bilir-b17413158/"><LinkedInIcon /></SocialLink>
           <SocialLink href="https://github.com/egowic"><GitHubIcon /></SocialLink>

@@ -7,6 +7,17 @@ export const SKILLS = [
 
 export const PROJECTS = [
   {
+    name: 'Portfolio',
+    stack: ['React', 'Vite', 'GitHub Actions', 'GitHub Pages'],
+    year: '2026',
+    link: 'https://egowic.github.io/portfolio/',
+    tag: { en: 'Personal', tr: 'Kişisel' },
+    desc: {
+      en: 'Personal portfolio site built with React and Vite. Structured for scalability with component-based architecture, bilingual (EN/TR) support, and automated CI/CD deployment via GitHub Actions.',
+      tr: 'React ve Vite ile inşa edilmiş kişisel portföy sitesi. Bileşen tabanlı mimari, çift dil (TR/EN) desteği ve GitHub Actions ile otomatik CI/CD deploy.',
+    },
+  },
+  {
     name: 'AMDb',
     stack: ['Python', 'Backend', 'NLP', 'MongoDB'],
     year: '2022',

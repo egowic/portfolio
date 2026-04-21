@@ -22,7 +22,7 @@ export default function Hero() {
   return (
     <section
       className="hero-section"
-      style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', padding: '0 48px', maxWidth: 860, margin: '0 auto' }}
+      style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', padding: '80px 48px 48px', maxWidth: 860, margin: '0 auto' }}
     >
       <div className="fade-up" style={{ width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 32 }}>
@@ -37,7 +37,7 @@ export default function Hero() {
           Ege Bilir
         </h1>
 
-        <p className="mono" style={{ fontSize: 'clamp(13px, 1.8vw, 16px)', color: '#555', marginBottom: 28, letterSpacing: '0.02em' }}>
+        <p className="mono" style={{ fontSize: 'clamp(13px, 1.8vw, 16px)', color: '#888', marginBottom: 28, letterSpacing: '0.02em' }}>
           <TypeWriter text={t.heroTyped} speed={45} delay={200} />
         </p>
 

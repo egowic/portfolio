@@ -1,13 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function TypeWriter({ text, speed = 50, delay = 300 }) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
-  const prevText = useRef('');
 
   useEffect(() => {
-    if (prevText.current === text) return;
-    prevText.current = text;
     setDisplayed('');
     setDone(false);
     let i = 0;

@@ -8,7 +8,7 @@ export default function About() {
     <section
       id="about"
       className="section-inner"
-      style={{ padding: '100px 48px', maxWidth: 860, margin: '0 auto' }}
+      style={{ padding: '48px 48px 64px', maxWidth: 860, margin: '0 auto' }}
     >
       <hr className="divider" style={{ marginBottom: 64 }} />
       <div className="section-label">{t.s1label}</div>
