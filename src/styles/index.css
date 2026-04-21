@@ -42,7 +42,7 @@ body { background: #0a0a0b; color: #e8e6e1; font-family: 'Inter', sans-serif; -w
 @media (max-width: 680px) {
   .nav-links-desktop { display: none !important; }
   .hamburger { display: flex !important; }
-  .hero-section { padding: 0 24px !important; padding-top: 80px !important; min-height: 100svh !important; }
+  .hero-section { padding: 100px 24px 48px !important; }
   .section-inner { padding: 64px 24px !important; }
   .about-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
   .project-card { padding: 20px 18px !important; }

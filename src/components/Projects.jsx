@@ -8,7 +8,7 @@ export default function Projects() {
     <section
       id="projects"
       className="section-inner"
-      style={{ padding: '100px 48px', maxWidth: 860, margin: '0 auto' }}
+      style={{ padding: '48px 48px 64px', maxWidth: 860, margin: '0 auto' }}
     >
       <hr className="divider" style={{ marginBottom: 64 }} />
       <div className="section-label">{t.s2label}</div>
@@ -34,16 +34,31 @@ export default function Projects() {
               <span className="mono" style={{ fontSize: 11, color: '#444' }}>{p.year}</span>
             </div>
             <p style={{ color: '#666', fontSize: 14, lineHeight: 1.75, marginBottom: 20 }}>{p.desc[lang]}</p>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {p.stack.map(tag => (
-                <span
-                  key={tag}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {p.stack.map(tag => (
+                  <span
+                    key={tag}
+                    className="mono"
+                    style={{ fontSize: 10, color: '#555', background: '#111114', border: '1px solid #1e1e22', borderRadius: 4, padding: '3px 8px' }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              {p.link && (
+                <a
+                  href={p.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="mono"
-                  style={{ fontSize: 10, color: '#555', background: '#111114', border: '1px solid #1e1e22', borderRadius: 4, padding: '3px 8px' }}
+                  style={{ fontSize: 11, color: ACCENT, textDecoration: 'none', borderBottom: `1px solid ${ACCENT}`, paddingBottom: 2, transition: 'opacity 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
+                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                 >
-                  {tag}
-                </span>
-              ))}
+                  visit site →
+                </a>
+              )}
             </div>
           </div>
         ))}
