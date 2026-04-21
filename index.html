@@ -51,7 +51,7 @@
     .section-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; color: #3a7bd5; text-transform: uppercase; margin-bottom: 8px; }
     .divider { border: none; border-top: 1px solid #18181c; }
 
-    .lang-toggle { display: flex; background: #111114; border: 1px solid #222226; border-radius: 6px; overflow: hidden; }
+    .lang-toggle { display: inline-flex; background: #111114; border: 1px solid #222226; border-radius: 6px; overflow: hidden; }
     .lang-btn { padding: 5px 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #555; background: transparent; border: none; cursor: pointer; transition: color 0.2s, background 0.2s; }
     .lang-btn.active { color: #f0ece5; background: #1e1e22; }
     .lang-btn:hover:not(.active) { color: #888; }
@@ -74,7 +74,7 @@
     @media (max-width: 680px) {
       .nav-links-desktop { display: none !important; }
       .hamburger { display: flex !important; }
-      .lang-toggle-mobile { display: block !important; }
+
       .hero-section { padding: 0 24px !important; padding-top: 80px !important; min-height: 100svh !important; }
       .section-inner { padding: 64px 24px !important; }
       .about-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
@@ -306,7 +306,7 @@ function Nav() {
         </div>
         {/* Mobile right: lang + hamburger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ display: 'none' }} className="lang-toggle-mobile"><LangToggle /></div>
+  
           <button className="hamburger" onClick={() => setMenuOpen(o => !o)} aria-label="menu">
             <span style={{ transform: menuOpen ? 'rotate(45deg) translate(5px,5px)' : 'none' }}/>
             <span style={{ opacity: menuOpen ? 0 : 1 }}/>
@@ -319,7 +319,7 @@ function Nav() {
         {t.nav.map((label, i) => (
           <a key={i} href={t.navHrefs[i]} className="nav-link" onClick={closeMenu}>{label}</a>
         ))}
-        <div style={{ marginTop: 4 }}><LangToggle /></div>
+        <div style={{ marginTop: 4, display: 'inline-flex' }}><LangToggle /></div>
       </div>
     </>
   );
