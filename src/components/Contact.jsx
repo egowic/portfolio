@@ -1,14 +1,45 @@
+import { useState } from 'react';
 import { useLang } from '../context/LangContext';
 import { ACCENT } from '../data';
 import { LinkedInIcon, GitHubIcon } from './Icons';
+import { supabase } from '../lib/supabase';
 
 const CONTACT_ITEMS = [
   { label: 'email', value: 'ege.bilir@gmail.com', href: 'mailto:ege.bilir@gmail.com' },
   { label: 'tel', value: '+90 539 606 84 91', href: 'tel:+905396068491' },
 ];
 
+const FORM_LABELS = {
+  en: { name: 'name', email: 'email', message: 'message', send: 'send message →', sending: 'sending...', success: 'Message sent!', error: 'Something went wrong. Try again.' },
+  tr: { name: 'isim', email: 'e-posta', message: 'mesaj', send: 'mesaj gönder →', sending: 'gönderiliyor...', success: 'Mesaj gönderildi!', error: 'Bir hata oluştu. Tekrar deneyin.' },
+};
+
 export default function Contact() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const fl = FORM_LABELS[lang];
+
+  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+
+  function handleChange(e) {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setStatus('sending');
+    const { error } = await supabase.from('contacts').insert([{
+      name: form.name.trim(),
+      email: form.email.trim(),
+      message: form.message.trim(),
+    }]);
+    if (error) {
+      setStatus('error');
+    } else {
+      setStatus('success');
+      setForm({ name: '', email: '', message: '' });
+    }
+  }
 
   return (
     <section
@@ -23,7 +54,7 @@ export default function Contact() {
       </h2>
       <p style={{ color: '#666', fontSize: 14, lineHeight: 1.75, maxWidth: 460, marginBottom: 48 }}>{t.s3sub}</p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 48 }}>
         {CONTACT_ITEMS.map(item => (
           <div key={item.label} style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
             <span className="mono" style={{ fontSize: 11, color: '#444', width: 40, flexShrink: 0 }}>{item.label}</span>
@@ -44,6 +75,58 @@ export default function Contact() {
         ))}
       </div>
 
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}>
+        {['name', 'email'].map(field => (
+          <div key={field} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label className="mono" style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}>{fl[field]}</label>
+            <input
+              type={field === 'email' ? 'email' : 'text'}
+              name={field}
+              value={form[field]}
+              onChange={handleChange}
+              required
+              style={inputStyle}
+              onFocus={e => e.currentTarget.style.borderColor = ACCENT}
+              onBlur={e => e.currentTarget.style.borderColor = '#1e1e22'}
+            />
+          </div>
+        ))}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <label className="mono" style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}>{fl.message}</label>
+          <textarea
+            name="message"
+            value={form.message}
+            onChange={handleChange}
+            required
+            rows={5}
+            style={{ ...inputStyle, resize: 'vertical' }}
+            onFocus={e => e.currentTarget.style.borderColor = ACCENT}
+            onBlur={e => e.currentTarget.style.borderColor = '#1e1e22'}
+          />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 8 }}>
+          <button
+            type="submit"
+            disabled={status === 'sending' || status === 'success'}
+            className="mono"
+            style={{
+              fontSize: 11, color: ACCENT, background: 'none', border: `1px solid ${ACCENT}`,
+              borderRadius: 4, padding: '8px 16px', cursor: status === 'sending' ? 'wait' : 'pointer',
+              transition: 'opacity 0.2s', opacity: status === 'success' ? 0.5 : 1,
+            }}
+          >
+            {status === 'sending' ? fl.sending : fl.send}
+          </button>
+          {status === 'success' && (
+            <span className="mono" style={{ fontSize: 11, color: '#4caf50' }}>{fl.success}</span>
+          )}
+          {status === 'error' && (
+            <span className="mono" style={{ fontSize: 11, color: '#c0392b' }}>{fl.error}</span>
+          )}
+        </div>
+      </form>
+
       <div
         className="footer-row"
         style={{ marginTop: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
@@ -57,6 +140,18 @@ export default function Contact() {
     </section>
   );
 }
+
+const inputStyle = {
+  background: '#0d0d10',
+  border: '1px solid #1e1e22',
+  borderRadius: 4,
+  padding: '10px 12px',
+  color: '#f0ece5',
+  fontSize: 13,
+  fontFamily: 'inherit',
+  outline: 'none',
+  transition: 'border-color 0.2s',
+};
 
 function SocialLink({ href, children }) {
   return (
