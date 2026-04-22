@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLang } from '../context/LangContext';
 import { ACCENT } from '../data';
-import { supabase } from '../lib/supabase';
+import { getProjects } from '../services/projectsService';
+import ProjectSkeleton from './ProjectSkeleton';
 
 export default function Projects() {
   const { t, lang } = useLang();
@@ -10,15 +11,10 @@ export default function Projects() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    supabase
-      .from('projects')
-      .select('*')
-      .order('order_index')
-      .then(({ data, error }) => {
-        if (error) setError(error.message);
-        else setProjects(data ?? []);
-        setLoading(false);
-      });
+    getProjects()
+      .then(setProjects)
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -33,15 +29,12 @@ export default function Projects() {
         {t.s2title}
       </h2>
 
-      {loading && (
-        <p className="mono" style={{ fontSize: 12, color: '#444' }}>loading...</p>
-      )}
-      {error && (
-        <p className="mono" style={{ fontSize: 12, color: '#c0392b' }}>{error}</p>
-      )}
-
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {projects.map((p) => (
+        {loading && <ProjectSkeleton />}
+        {error && (
+          <p className="mono" style={{ fontSize: 12, color: '#c0392b' }}>{error}</p>
+        )}
+        {!loading && !error && projects.map((p) => (
           <div
             key={p.id}
             className="card-hover project-card"
@@ -89,7 +82,7 @@ export default function Projects() {
             </div>
           </div>
         ))}
-      </div>
+        </div>
     </section>
   );
 }

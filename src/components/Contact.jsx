@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useLang } from '../context/LangContext';
 import { ACCENT } from '../data';
 import { LinkedInIcon, GitHubIcon } from './Icons';
-import { supabase } from '../lib/supabase';
+import { submitContact } from '../services/contactsService';
+import { validateContactForm, isValid } from '../utils/validation';
 
 const CONTACT_ITEMS = [
   { label: 'email', value: 'ege.bilir@gmail.com', href: 'mailto:ege.bilir@gmail.com' },
@@ -10,8 +11,16 @@ const CONTACT_ITEMS = [
 ];
 
 const FORM_LABELS = {
-  en: { name: 'name', email: 'email', message: 'message', send: 'send message →', sending: 'sending...', success: 'Message sent!', error: 'Something went wrong. Try again.' },
-  tr: { name: 'isim', email: 'e-posta', message: 'mesaj', send: 'mesaj gönder →', sending: 'gönderiliyor...', success: 'Mesaj gönderildi!', error: 'Bir hata oluştu. Tekrar deneyin.' },
+  en: {
+    name: 'name', email: 'email', message: 'message',
+    send: 'send message →', sending: 'sending...',
+    success: 'Message sent!', error: 'Something went wrong. Try again.',
+  },
+  tr: {
+    name: 'isim', email: 'e-posta', message: 'mesaj',
+    send: 'mesaj gönder →', sending: 'gönderiliyor...',
+    success: 'Mesaj gönderildi!', error: 'Bir hata oluştu. Tekrar deneyin.',
+  },
 };
 
 export default function Contact() {
@@ -19,25 +28,32 @@ export default function Contact() {
   const fl = FORM_LABELS[lang];
 
   const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [fieldErrors, setFieldErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | sending | success | error
 
   function handleChange(e) {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+    }
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
+    const errors = validateContactForm(form);
+    if (!isValid(errors)) {
+      setFieldErrors(errors);
+      return;
+    }
     setStatus('sending');
-    const { error } = await supabase.from('contacts').insert([{
-      name: form.name.trim(),
-      email: form.email.trim(),
-      message: form.message.trim(),
-    }]);
-    if (error) {
-      setStatus('error');
-    } else {
+    try {
+      await submitContact(form);
       setStatus('success');
       setForm({ name: '', email: '', message: '' });
+      setFieldErrors({});
+    } catch {
+      setStatus('error');
     }
   }
 
@@ -75,7 +91,7 @@ export default function Contact() {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}>
+      <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}>
         {['name', 'email'].map(field => (
           <div key={field} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label className="mono" style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}>{fl[field]}</label>
@@ -84,11 +100,13 @@ export default function Contact() {
               name={field}
               value={form[field]}
               onChange={handleChange}
-              required
-              style={inputStyle}
-              onFocus={e => e.currentTarget.style.borderColor = ACCENT}
-              onBlur={e => e.currentTarget.style.borderColor = '#1e1e22'}
+              style={{ ...inputStyle, borderColor: fieldErrors[field] ? '#c0392b' : '#1e1e22' }}
+              onFocus={e => e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : ACCENT}
+              onBlur={e => e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : '#1e1e22'}
             />
+            {fieldErrors[field] && (
+              <span className="mono" style={{ fontSize: 10, color: '#c0392b' }}>{fieldErrors[field]}</span>
+            )}
           </div>
         ))}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -97,12 +115,14 @@ export default function Contact() {
             name="message"
             value={form.message}
             onChange={handleChange}
-            required
             rows={5}
-            style={{ ...inputStyle, resize: 'vertical' }}
-            onFocus={e => e.currentTarget.style.borderColor = ACCENT}
-            onBlur={e => e.currentTarget.style.borderColor = '#1e1e22'}
+            style={{ ...inputStyle, resize: 'vertical', borderColor: fieldErrors.message ? '#c0392b' : '#1e1e22' }}
+            onFocus={e => e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : ACCENT}
+            onBlur={e => e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : '#1e1e22'}
           />
+          {fieldErrors.message && (
+            <span className="mono" style={{ fontSize: 10, color: '#c0392b' }}>{fieldErrors.message}</span>
+          )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 8 }}>
