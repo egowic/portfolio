@@ -5,49 +5,6 @@ export const SKILLS = [
   'REST APIs', 'Backend Dev', 'Big Data', 'C#', 'HTML/CSS', 'Git', 'Agile',
 ];
 
-export const PROJECTS = [
-  {
-    name: 'Portfolio',
-    stack: ['React', 'Vite', 'GitHub Actions', 'GitHub Pages'],
-    year: '2026',
-    link: 'https://egowic.github.io/portfolio/',
-    tag: { en: 'Personal', tr: 'Kişisel' },
-    desc: {
-      en: 'Personal portfolio site built with React and Vite. Structured for scalability with component-based architecture, bilingual (EN/TR) support, and automated CI/CD deployment via GitHub Actions.',
-      tr: 'React ve Vite ile inşa edilmiş kişisel portföy sitesi. Bileşen tabanlı mimari, çift dil (TR/EN) desteği ve GitHub Actions ile otomatik CI/CD deploy.',
-    },
-  },
-  {
-    name: 'AMDb',
-    stack: ['Python', 'Backend', 'NLP', 'MongoDB'],
-    year: '2022',
-    tag: { en: 'MSc Graduation Project', tr: 'Yüksek Lisans Bitirme Projesi' },
-    desc: {
-      en: 'Authentic Movie Database — a movie review platform combining toxicity detection and sentiment analysis to surface high-quality, user-friendly film reviews.',
-      tr: 'Authentic Movie Database — film eleştirilerinde toksisite tespiti ve duygu analizi birleştiren, kullanıcı dostu bir film inceleme platformu.',
-    },
-  },
-  {
-    name: 'Insurance Platform',
-    stack: ['Java / Gosu', 'REST API', 'SQL', 'Guidewire'],
-    year: '2022',
-    tag: { en: 'Enterprise', tr: 'Kurumsal' },
-    desc: {
-      en: "Feature development and REST API integrations for Guidewire's insurance platform. Handled PII data with SQL and built solutions in Gosu (Java-based).",
-      tr: "Guidewire'ın sigorta platformu için özellik geliştirme ve REST API entegrasyonları. SQL ile PII verisi yönetimi, Gosu (Java tabanlı) ile çözüm geliştirme.",
-    },
-  },
-  {
-    name: 'Fonzip — İş Bank',
-    stack: ['JavaScript', 'CSS', 'jQuery', 'Agile'],
-    year: '2019',
-    tag: { en: 'Internship', tr: 'Staj' },
-    desc: {
-      en: "Frontend contribution to İş Bank's endowment fund system. Worked with the internal team using agile methodology, contributed to CSS/JS development and QA.",
-      tr: "İş Bankası'nın Fonzip bağış fonu sistemi için frontend katkısı. Agile metodolojisiyle çalışıldı; CSS/JS geliştirme ve QA süreçlerine katılım sağlandı.",
-    },
-  },
-];
 
 export const EXPERIENCE = [
   {

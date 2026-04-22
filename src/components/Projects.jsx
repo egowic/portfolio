@@ -1,8 +1,25 @@
+import { useState, useEffect } from 'react';
 import { useLang } from '../context/LangContext';
-import { ACCENT, PROJECTS } from '../data';
+import { ACCENT } from '../data';
+import { supabase } from '../lib/supabase';
 
 export default function Projects() {
   const { t, lang } = useLang();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    supabase
+      .from('projects')
+      .select('*')
+      .order('order_index')
+      .then(({ data, error }) => {
+        if (error) setError(error.message);
+        else setProjects(data ?? []);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <section
@@ -15,28 +32,38 @@ export default function Projects() {
       <h2 style={{ fontSize: 32, fontWeight: 300, color: '#f0ece5', marginBottom: 48, letterSpacing: '-0.02em' }}>
         {t.s2title}
       </h2>
+
+      {loading && (
+        <p className="mono" style={{ fontSize: 12, color: '#444' }}>loading...</p>
+      )}
+      {error && (
+        <p className="mono" style={{ fontSize: 12, color: '#c0392b' }}>{error}</p>
+      )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {PROJECTS.map((p, i) => (
+        {projects.map((p) => (
           <div
-            key={i}
+            key={p.id}
             className="card-hover project-card"
             style={{ border: '1px solid #18181c', borderRadius: 8, padding: '28px 32px', background: '#0d0d10' }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
               <div>
                 <span className="mono" style={{ fontSize: 10, color: ACCENT, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  {p.tag[lang]}
+                  {lang === 'tr' ? p.tag_tr : p.tag_en}
                 </span>
                 <h3 style={{ fontSize: 20, fontWeight: 400, color: '#f0ece5', marginTop: 6, letterSpacing: '-0.01em' }}>
-                  {p.name}
+                  {p.title}
                 </h3>
               </div>
               <span className="mono" style={{ fontSize: 11, color: '#444' }}>{p.year}</span>
             </div>
-            <p style={{ color: '#666', fontSize: 14, lineHeight: 1.75, marginBottom: 20 }}>{p.desc[lang]}</p>
+            <p style={{ color: '#666', fontSize: 14, lineHeight: 1.75, marginBottom: 20 }}>
+              {lang === 'tr' ? p.desc_tr : p.desc_en}
+            </p>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {p.stack.map(tag => (
+                {(p.tech ?? []).map(tag => (
                   <span
                     key={tag}
                     className="mono"
