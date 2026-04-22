@@ -3,17 +3,18 @@ import { useLang } from '../context/LangContext';
 import { ACCENT } from '../data';
 import { getProjects } from '../services/projectsService';
 import ProjectSkeleton from './ProjectSkeleton';
+import type { Project } from '../types';
 
 export default function Projects() {
   const { t, lang } = useLang();
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     getProjects()
       .then(setProjects)
-      .catch(err => setError(err.message))
+      .catch((err: Error) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -73,8 +74,8 @@ export default function Projects() {
                   rel="noopener noreferrer"
                   className="mono"
                   style={{ fontSize: 11, color: ACCENT, textDecoration: 'none', borderBottom: `1px solid ${ACCENT}`, paddingBottom: 2, transition: 'opacity 0.2s' }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = '0.7'}
-                  onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                 >
                   visit site →
                 </a>

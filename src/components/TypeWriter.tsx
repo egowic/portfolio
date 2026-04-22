@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 
-export default function TypeWriter({ text, speed = 50, delay = 300 }) {
+interface Props {
+  text: string;
+  speed?: number;
+  delay?: number;
+}
+
+export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
 

@@ -1,10 +1,11 @@
 import { supabase } from '../lib/supabase';
+import type { Project } from '../types';
 
-export async function getProjects() {
+export async function getProjects(): Promise<Project[]> {
   const { data, error } = await supabase
     .from('projects')
     .select('*')
     .order('order_index');
   if (error) throw new Error(error.message);
-  return data ?? [];
+  return (data as Project[]) ?? [];
 }

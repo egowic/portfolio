@@ -1,16 +1,30 @@
 import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import { useLang } from '../context/LangContext';
 import { ACCENT } from '../data';
 import { LinkedInIcon, GitHubIcon } from './Icons';
 import { submitContact } from '../services/contactsService';
 import { validateContactForm, isValid } from '../utils/validation';
+import type { ContactFormData, ValidationErrors } from '../types';
 
 const CONTACT_ITEMS = [
   { label: 'email', value: 'ege.bilir@gmail.com', href: 'mailto:ege.bilir@gmail.com' },
   { label: 'tel', value: '+90 539 606 84 91', href: 'tel:+905396068491' },
 ];
 
-const FORM_LABELS = {
+type FormStatus = 'idle' | 'sending' | 'success' | 'error';
+
+interface FormLabels {
+  name: string;
+  email: string;
+  message: string;
+  send: string;
+  sending: string;
+  success: string;
+  error: string;
+}
+
+const FORM_LABELS: Record<'en' | 'tr', FormLabels> = {
   en: {
     name: 'name', email: 'email', message: 'message',
     send: 'send message →', sending: 'sending...',
@@ -23,23 +37,50 @@ const FORM_LABELS = {
   },
 };
 
+const inputStyle: CSSProperties = {
+  background: '#0d0d10',
+  border: '1px solid #1e1e22',
+  borderRadius: 4,
+  padding: '10px 12px',
+  color: '#f0ece5',
+  fontSize: 13,
+  fontFamily: 'inherit',
+  outline: 'none',
+  transition: 'border-color 0.2s',
+};
+
+function SocialLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: '#333', transition: 'color 0.2s', display: 'flex' }}
+      onMouseEnter={e => (e.currentTarget.style.color = ACCENT)}
+      onMouseLeave={e => (e.currentTarget.style.color = '#333')}
+    >
+      {children}
+    </a>
+  );
+}
+
 export default function Contact() {
   const { t, lang } = useLang();
   const fl = FORM_LABELS[lang];
 
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  const [form, setForm] = useState<ContactFormData>({ name: '', email: '', message: '' });
+  const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
+  const [status, setStatus] = useState<FormStatus>('idle');
 
-  function handleChange(e) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
-    if (fieldErrors[name]) {
+    if (fieldErrors[name as keyof ValidationErrors]) {
       setFieldErrors(prev => ({ ...prev, [name]: undefined }));
     }
   }
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const errors = validateContactForm(form);
     if (!isValid(errors)) {
@@ -92,7 +133,7 @@ export default function Contact() {
       </div>
 
       <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}>
-        {['name', 'email'].map(field => (
+        {(['name', 'email'] as const).map(field => (
           <div key={field} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label className="mono" style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}>{fl[field]}</label>
             <input
@@ -101,8 +142,8 @@ export default function Contact() {
               value={form[field]}
               onChange={handleChange}
               style={{ ...inputStyle, borderColor: fieldErrors[field] ? '#c0392b' : '#1e1e22' }}
-              onFocus={e => e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : ACCENT}
-              onBlur={e => e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : '#1e1e22'}
+              onFocus={e => (e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : ACCENT)}
+              onBlur={e => (e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : '#1e1e22')}
             />
             {fieldErrors[field] && (
               <span className="mono" style={{ fontSize: 10, color: '#c0392b' }}>{fieldErrors[field]}</span>
@@ -117,8 +158,8 @@ export default function Contact() {
             onChange={handleChange}
             rows={5}
             style={{ ...inputStyle, resize: 'vertical', borderColor: fieldErrors.message ? '#c0392b' : '#1e1e22' }}
-            onFocus={e => e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : ACCENT}
-            onBlur={e => e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : '#1e1e22'}
+            onFocus={e => (e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : ACCENT)}
+            onBlur={e => (e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : '#1e1e22')}
           />
           {fieldErrors.message && (
             <span className="mono" style={{ fontSize: 10, color: '#c0392b' }}>{fieldErrors.message}</span>
@@ -158,32 +199,5 @@ export default function Contact() {
         </div>
       </div>
     </section>
-  );
-}
-
-const inputStyle = {
-  background: '#0d0d10',
-  border: '1px solid #1e1e22',
-  borderRadius: 4,
-  padding: '10px 12px',
-  color: '#f0ece5',
-  fontSize: 13,
-  fontFamily: 'inherit',
-  outline: 'none',
-  transition: 'border-color 0.2s',
-};
-
-function SocialLink({ href, children }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ color: '#333', transition: 'color 0.2s', display: 'flex' }}
-      onMouseEnter={e => e.currentTarget.style.color = ACCENT}
-      onMouseLeave={e => e.currentTarget.style.color = '#333'}
-    >
-      {children}
-    </a>
   );
 }

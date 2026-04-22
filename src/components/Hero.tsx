@@ -1,3 +1,4 @@
+import type { ReactNode, CSSProperties } from 'react';
 import { useLang } from '../context/LangContext';
 import { ACCENT } from '../data';
 import TypeWriter from './TypeWriter';
@@ -13,6 +14,53 @@ function Avatar() {
     }}>
       <img src={avatarUrl} alt="Ege Bilir" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
     </div>
+  );
+}
+
+interface OutlineButtonProps {
+  href: string;
+  accent?: boolean;
+  children: ReactNode;
+}
+
+function OutlineButton({ href, accent, children }: OutlineButtonProps) {
+  const base: CSSProperties = {
+    display: 'inline-flex', alignItems: 'center', gap: 8,
+    padding: '10px 20px', borderRadius: 6,
+    textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace',
+    fontSize: 13, cursor: 'pointer', transition: 'background 0.2s, color 0.2s, border-color 0.2s',
+    border: accent ? `1px solid ${ACCENT}` : '1px solid #222226',
+    color: accent ? ACCENT : '#888',
+  };
+
+  const handleEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (accent) {
+      e.currentTarget.style.background = ACCENT;
+      e.currentTarget.style.color = '#fff';
+    } else {
+      e.currentTarget.style.borderColor = '#444';
+      e.currentTarget.style.color = '#ccc';
+    }
+  };
+  const handleLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.background = 'transparent';
+    e.currentTarget.style.color = accent ? ACCENT : '#888';
+    e.currentTarget.style.borderColor = accent ? ACCENT : '#222226';
+  };
+
+  const isExternal = href.startsWith('http');
+
+  return (
+    <a
+      href={href}
+      style={base}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+    >
+      {children}
+    </a>
   );
 }
 
@@ -56,46 +104,5 @@ export default function Hero() {
         </div>
       </div>
     </section>
-  );
-}
-
-function OutlineButton({ href, accent, children }) {
-  const base = {
-    display: 'inline-flex', alignItems: 'center', gap: 8,
-    padding: '10px 20px', borderRadius: 6,
-    textDecoration: 'none', fontFamily: 'JetBrains Mono, monospace',
-    fontSize: 13, cursor: 'pointer', transition: 'background 0.2s, color 0.2s, border-color 0.2s',
-    border: accent ? `1px solid ${ACCENT}` : '1px solid #222226',
-    color: accent ? ACCENT : '#888',
-  };
-
-  const handleEnter = (e) => {
-    if (accent) {
-      e.currentTarget.style.background = ACCENT;
-      e.currentTarget.style.color = '#fff';
-    } else {
-      e.currentTarget.style.borderColor = '#444';
-      e.currentTarget.style.color = '#ccc';
-    }
-  };
-  const handleLeave = (e) => {
-    e.currentTarget.style.background = 'transparent';
-    e.currentTarget.style.color = accent ? ACCENT : '#888';
-    e.currentTarget.style.borderColor = accent ? ACCENT : '#222226';
-  };
-
-  const isExternal = href.startsWith('http');
-
-  return (
-    <a
-      href={href}
-      style={base}
-      target={isExternal ? '_blank' : undefined}
-      rel={isExternal ? 'noopener noreferrer' : undefined}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-    >
-      {children}
-    </a>
   );
 }

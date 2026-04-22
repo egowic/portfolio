@@ -1,12 +1,13 @@
+import type { ExperienceItem, Translation } from '../types';
+
 export const ACCENT = '#3a7bd5';
 
-export const SKILLS = [
+export const SKILLS: string[] = [
   'Java', 'Python', 'JavaScript', 'SQL', 'MongoDB',
   'REST APIs', 'Backend Dev', 'Big Data', 'C#', 'HTML/CSS', 'Git', 'Agile',
 ];
 
-
-export const EXPERIENCE = [
+export const EXPERIENCE: ExperienceItem[] = [
   {
     role: { en: 'Software Developer', tr: 'Yazılım Geliştirici' },
     company: 'Softtech A.Ş.',
@@ -27,7 +28,7 @@ export const EXPERIENCE = [
   },
 ];
 
-export const TRANSLATIONS = {
+export const TRANSLATIONS: Record<'en' | 'tr', Translation> = {
   en: {
     nav: ['01. about', '02. projects', '03. contact'],
     navHrefs: ['#about', '#projects', '#contact'],

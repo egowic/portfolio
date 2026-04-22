@@ -1,4 +1,6 @@
-const pulseStyle = {
+import type { CSSProperties } from 'react';
+
+const pulseStyle: CSSProperties = {
   background: 'linear-gradient(90deg, #111114 25%, #18181c 50%, #111114 75%)',
   backgroundSize: '200% 100%',
   animation: 'skeleton-pulse 1.4s ease infinite',
