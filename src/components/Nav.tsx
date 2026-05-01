@@ -29,7 +29,7 @@ export default function Nav() {
               <a
                 key={i}
                 href={t.navHrefs[i]}
-                className={`nav-link${isLast ? ' nav-cta' : ''}`}
+                className="nav-link"
               >
                 {label}
               </a>
