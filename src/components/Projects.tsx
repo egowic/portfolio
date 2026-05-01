@@ -48,9 +48,7 @@ function ProjectCard({ p, lang }: { p: Project; lang: 'en' | 'tr' }) {
           >
             ↗
           </a>
-        ) : (
-          <div className="project-arrow" style={{ opacity: 0.3, cursor: 'default' }}>↗</div>
-        )}
+        ) : null}
       </div>
       <div className="project-name">{p.title}</div>
       <p className="project-desc">{lang === 'tr' ? p.desc_tr : p.desc_en}</p>

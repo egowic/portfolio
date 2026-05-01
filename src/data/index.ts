@@ -12,7 +12,8 @@ export const EXPERIENCE: ExperienceItem[] = [
   {
     role: { en: 'Software Developer', tr: 'Yazılım Geliştirici' },
     company: 'Softtech A.Ş.',
-    period: null,
+    start: 'Jul 2023',
+    current: true,
     loc: { en: 'Istanbul, TR', tr: 'İstanbul, TR' },
   },
   {

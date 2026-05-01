@@ -9,6 +9,18 @@ const SKILL_GROUPS = [
 
 const ALL_SKILLS = new Set(SKILLS);
 
+function formatExperiencePeriod(
+  start: string | undefined,
+  period: string | null | undefined,
+  current: boolean | undefined,
+  presentLabel: string
+) {
+  if (current) {
+    return start ? `${start} – ${presentLabel}` : presentLabel;
+  }
+  return period ?? '';
+}
+
 function SkillGroups() {
   const remaining = SKILLS.filter(s => !SKILL_GROUPS.flatMap(g => g.skills).includes(s));
   const groups = remaining.length > 0
@@ -72,7 +84,7 @@ export default function About() {
                       <div className="exp-role">{exp.role[lang]}</div>
                     </div>
                     <div className="exp-period">
-                      {exp.period === null ? t.expPresent : exp.period} · {exp.loc[lang]}
+                      {formatExperiencePeriod(exp.start, exp.period, exp.current, t.expPresent)} · {exp.loc[lang]}
                     </div>
                   </div>
                 </div>
