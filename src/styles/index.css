@@ -13,7 +13,11 @@
   --danger: #ef4444;
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  width: 100%;
+  overflow-x: clip;
+}
 body {
   background:
     radial-gradient(circle at 15% 0%, rgba(79, 142, 247, 0.14), transparent 34rem),
@@ -24,6 +28,12 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+body, #root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 ::-webkit-scrollbar { width: 4px; }
@@ -294,6 +304,8 @@ section { position: relative; z-index: 1; }
   .hero-section { min-height: 92vh; }
   .about-grid, .contact-grid, .projects-grid, .form-row { grid-template-columns: 1fr; }
   .about-grid, .contact-grid { gap: 44px; }
+  .exp-meta { flex-direction: column; align-items: flex-start; }
+  .exp-period { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
   .project-card { padding: 24px; }
   .footer-row { flex-direction: column; gap: 16px; align-items: flex-start !important; }
 }
