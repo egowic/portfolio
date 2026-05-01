@@ -23,18 +23,9 @@ export default function Nav() {
       >
         <span className="nav-logo">EB</span>
         <div className="nav-links-desktop" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
-          {t.nav.map((label, i) => {
-            const isLast = i === t.nav.length - 1;
-            return (
-              <a
-                key={i}
-                href={t.navHrefs[i]}
-                className="nav-link"
-              >
-                {label}
-              </a>
-            );
-          })}
+          {t.nav.map((label, i) => (
+            <a key={i} href={t.navHrefs[i]} className="nav-link">{label}</a>
+          ))}
           <LangToggle />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
