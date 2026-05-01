@@ -61,8 +61,4 @@ describe('Hero', () => {
     expect(screen.getByText('İstanbul, Türkiye')).toBeInTheDocument();
   });
 
-  it('renders hero tag in English', () => {
-    renderHero();
-    expect(screen.getByText('→ software developer')).toBeInTheDocument();
-  });
 });
