@@ -21,6 +21,7 @@ export default function Nav() {
     <>
       <nav
         className="nav-bar"
+        aria-label="Main navigation"
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -44,7 +45,9 @@ export default function Nav() {
           <button
             className="hamburger"
             onClick={() => setMenuOpen(o => !o)}
-            aria-label="menu"
+            aria-label="Toggle navigation menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
           >
             <span style={{ transform: menuOpen ? 'rotate(45deg) translate(5px,5px)' : 'none' }} />
             <span style={{ opacity: menuOpen ? 0 : 1 }} />
@@ -52,14 +55,18 @@ export default function Nav() {
           </button>
         </div>
       </nav>
-      <div className={`mobile-menu${menuOpen ? ' open' : ''}`}>
+      <nav
+        id="mobile-nav"
+        aria-label="Mobile navigation"
+        className={`mobile-menu${menuOpen ? ' open' : ''}`}
+      >
         {t.nav.map((label, i) => (
           <a key={i} href={t.navHrefs[i]} className="nav-link" onClick={closeMenu}>{label}</a>
         ))}
         <div style={{ marginTop: 4, display: 'inline-flex' }}>
           <LangToggle />
         </div>
-      </div>
+      </nav>
     </>
   );
 }

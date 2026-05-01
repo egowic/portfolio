@@ -10,6 +10,7 @@ export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTagEn, setActiveTagEn] = useState<string | null>(null);
 
   useEffect(() => {
     getProjects()
@@ -18,25 +19,56 @@ export default function Projects() {
       .finally(() => setLoading(false));
   }, []);
 
+  const uniqueTagsEn = [...new Set(projects.map(p => p.tag_en))];
+  const filtered = activeTagEn ? projects.filter(p => p.tag_en === activeTagEn) : projects;
+
+  const tagLabel = (tagEn: string) => {
+    const match = projects.find(p => p.tag_en === tagEn);
+    return match ? (lang === 'tr' ? match.tag_tr : match.tag_en) : tagEn;
+  };
+
   return (
     <section
       id="projects"
       className="section-inner"
+      aria-label="Projects"
       style={{ padding: '48px 48px 64px', maxWidth: 860, margin: '0 auto' }}
     >
       <hr className="divider" style={{ marginBottom: 64 }} />
       <div className="section-label">{t.s2label}</div>
-      <h2 style={{ fontSize: 32, fontWeight: 300, color: '#f0ece5', marginBottom: 48, letterSpacing: '-0.02em' }}>
+      <h2 style={{ fontSize: 32, fontWeight: 300, color: '#f0ece5', marginBottom: 24, letterSpacing: '-0.02em' }}>
         {t.s2title}
       </h2>
+
+      {!loading && !error && uniqueTagsEn.length > 1 && (
+        <div role="group" aria-label="Filter projects by category" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
+          <button
+            className={`filter-btn${activeTagEn === null ? ' active' : ''}`}
+            onClick={() => setActiveTagEn(null)}
+            aria-pressed={activeTagEn === null}
+          >
+            {t.filterAll}
+          </button>
+          {uniqueTagsEn.map(tagEn => (
+            <button
+              key={tagEn}
+              className={`filter-btn${activeTagEn === tagEn ? ' active' : ''}`}
+              onClick={() => setActiveTagEn(prev => prev === tagEn ? null : tagEn)}
+              aria-pressed={activeTagEn === tagEn}
+            >
+              {tagLabel(tagEn)}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
         {loading && <ProjectSkeleton />}
         {error && (
-          <p className="mono" style={{ fontSize: 12, color: '#c0392b' }}>{error}</p>
+          <p className="mono" role="alert" style={{ fontSize: 12, color: '#c0392b' }}>{error}</p>
         )}
-        {!loading && !error && projects.map((p) => (
-          <div
+        {!loading && !error && filtered.map((p) => (
+          <article
             key={p.id}
             className="card-hover project-card"
             style={{ border: '1px solid #18181c', borderRadius: 8, padding: '28px 32px', background: '#0d0d10' }}
@@ -72,18 +104,16 @@ export default function Projects() {
                   href={p.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mono"
-                  style={{ fontSize: 11, color: ACCENT, textDecoration: 'none', borderBottom: `1px solid ${ACCENT}`, paddingBottom: 2, transition: 'opacity 0.2s' }}
-                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.7')}
-                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                  aria-label={`Visit ${p.title} site`}
+                  className="mono project-visit-link"
                 >
-                  visit site →
+                  {t.visitSite}
                 </a>
               )}
             </div>
-          </div>
+          </article>
         ))}
-        </div>
+      </div>
     </section>
   );
 }

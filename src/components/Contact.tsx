@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { useLang } from '../context/LangContext';
 import { ACCENT } from '../data';
@@ -71,6 +71,8 @@ export default function Contact() {
   const [form, setForm] = useState<ContactFormData>({ name: '', email: '', message: '' });
   const [fieldErrors, setFieldErrors] = useState<ValidationErrors>({});
   const [status, setStatus] = useState<FormStatus>('idle');
+  const [cooldown, setCooldown] = useState(false);
+  const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
@@ -82,6 +84,7 @@ export default function Contact() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (status === 'sending' || status === 'success' || cooldown) return;
     const errors = validateContactForm(form);
     if (!isValid(errors)) {
       setFieldErrors(errors);
@@ -95,8 +98,15 @@ export default function Contact() {
       setFieldErrors({});
     } catch {
       setStatus('error');
+      setCooldown(true);
+      cooldownTimer.current = setTimeout(() => {
+        setCooldown(false);
+        setStatus('idle');
+      }, 10000);
     }
   }
+
+  const isDisabled = status === 'sending' || status === 'success' || cooldown;
 
   return (
     <section
@@ -132,58 +142,83 @@ export default function Contact() {
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}>
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        aria-label="Contact form"
+        style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}
+      >
         {(['name', 'email'] as const).map(field => (
           <div key={field} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label className="mono" style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}>{fl[field]}</label>
+            <label
+              htmlFor={`contact-${field}`}
+              className="mono"
+              style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}
+            >
+              {fl[field]}
+            </label>
             <input
+              id={`contact-${field}`}
               type={field === 'email' ? 'email' : 'text'}
               name={field}
               value={form[field]}
               onChange={handleChange}
+              aria-required="true"
+              aria-invalid={!!fieldErrors[field]}
+              aria-describedby={fieldErrors[field] ? `${field}-error` : undefined}
               style={{ ...inputStyle, borderColor: fieldErrors[field] ? '#c0392b' : '#1e1e22' }}
               onFocus={e => (e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : ACCENT)}
               onBlur={e => (e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : '#1e1e22')}
             />
             {fieldErrors[field] && (
-              <span className="mono" style={{ fontSize: 10, color: '#c0392b' }}>{fieldErrors[field]}</span>
+              <span id={`${field}-error`} role="alert" className="mono" style={{ fontSize: 10, color: '#c0392b' }}>
+                {fieldErrors[field]}
+              </span>
             )}
           </div>
         ))}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <label className="mono" style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}>{fl.message}</label>
+          <label
+            htmlFor="contact-message"
+            className="mono"
+            style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}
+          >
+            {fl.message}
+          </label>
           <textarea
+            id="contact-message"
             name="message"
             value={form.message}
             onChange={handleChange}
             rows={5}
+            aria-required="true"
+            aria-invalid={!!fieldErrors.message}
+            aria-describedby={fieldErrors.message ? 'message-error' : undefined}
             style={{ ...inputStyle, resize: 'vertical', borderColor: fieldErrors.message ? '#c0392b' : '#1e1e22' }}
             onFocus={e => (e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : ACCENT)}
             onBlur={e => (e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : '#1e1e22')}
           />
           {fieldErrors.message && (
-            <span className="mono" style={{ fontSize: 10, color: '#c0392b' }}>{fieldErrors.message}</span>
+            <span id="message-error" role="alert" className="mono" style={{ fontSize: 10, color: '#c0392b' }}>
+              {fieldErrors.message}
+            </span>
           )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 8 }}>
           <button
             type="submit"
-            disabled={status === 'sending' || status === 'success'}
-            className="mono"
-            style={{
-              fontSize: 11, color: ACCENT, background: 'none', border: `1px solid ${ACCENT}`,
-              borderRadius: 4, padding: '8px 16px', cursor: status === 'sending' ? 'wait' : 'pointer',
-              transition: 'opacity 0.2s', opacity: status === 'success' ? 0.5 : 1,
-            }}
+            disabled={isDisabled}
+            className="mono submit-btn"
+            aria-busy={status === 'sending'}
           >
             {status === 'sending' ? fl.sending : fl.send}
           </button>
           {status === 'success' && (
-            <span className="mono" style={{ fontSize: 11, color: '#4caf50' }}>{fl.success}</span>
+            <span role="status" className="mono" style={{ fontSize: 11, color: '#4caf50' }}>{fl.success}</span>
           )}
-          {status === 'error' && (
-            <span className="mono" style={{ fontSize: 11, color: '#c0392b' }}>{fl.error}</span>
+          {(status === 'error' || cooldown) && (
+            <span role="alert" className="mono" style={{ fontSize: 11, color: '#c0392b' }}>{fl.error}</span>
           )}
         </div>
       </form>

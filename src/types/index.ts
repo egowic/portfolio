@@ -49,6 +49,8 @@ export interface Translation {
   skillTitle: string;
   s2label: string;
   s2title: string;
+  filterAll: string;
+  visitSite: string;
   s3label: string;
   s3title: string;
   s3sub: string;

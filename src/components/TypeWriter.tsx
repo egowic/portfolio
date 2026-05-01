@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Props {
   text: string;
@@ -9,15 +9,24 @@ interface Props {
 export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
+  const generation = useRef(0);
 
   useEffect(() => {
-    setDisplayed('');
-    setDone(false);
-    let i = 0;
+    generation.current += 1;
+    const gen = generation.current;
+
     const timeout = setTimeout(() => {
+      if (gen !== generation.current) return;
+      setDisplayed('');
+      setDone(false);
+      let i = 0;
       const interval = setInterval(() => {
-        setDisplayed(text.slice(0, i + 1));
+        if (gen !== generation.current) {
+          clearInterval(interval);
+          return;
+        }
         i++;
+        setDisplayed(text.slice(0, i));
         if (i >= text.length) {
           clearInterval(interval);
           setDone(true);
@@ -25,6 +34,7 @@ export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
       }, speed);
       return () => clearInterval(interval);
     }, delay);
+
     return () => clearTimeout(timeout);
   }, [text, speed, delay]);
 
