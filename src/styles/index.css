@@ -55,9 +55,17 @@ body, #root {
 @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes scrollBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+@keyframes typewriterReveal { to { opacity: 1; transform: translateY(0); } }
 
 .mono { font-family: 'JetBrains Mono', monospace; }
 .cursor { display: inline-block; animation: blink 1s step-end infinite; }
+.typewriter-reveal {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(6px);
+  animation: typewriterReveal 0.55s ease forwards;
+  animation-delay: var(--typewriter-delay, 0ms);
+}
 .fade-up { animation: fadeUp 0.75s ease both; }
 
 .particle-canvas {
@@ -320,8 +328,7 @@ section { position: relative; z-index: 1; }
   .mesh-orb-3 { width: 240px; height: 240px; left: 20%; opacity: 0.45; }
   .aurora-line,
   .hero-badge-dot,
-  .scroll-chevron,
-  .cursor { animation: none; }
+  .scroll-chevron { animation: none; }
   .hero-photo,
   .fade-up { animation-duration: 0.45s; }
   .exp-card,
@@ -337,4 +344,12 @@ section { position: relative; z-index: 1; }
   .exp-period { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
   .project-card { padding: 24px; }
   .footer-row { flex-direction: column; gap: 16px; align-items: flex-start !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import type { CSSProperties } from 'react';
 
 interface Props {
   text: string;
@@ -9,6 +10,7 @@ interface Props {
 export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
   const [displayed, setDisplayed] = useState('');
   const [done, setDone] = useState(false);
+  const [useReveal, setUseReveal] = useState(false);
   const generation = useRef(0);
 
   useEffect(() => {
@@ -18,17 +20,20 @@ export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
     let intervalId: ReturnType<typeof setInterval> | null = null;
     const prefersStableText = window.matchMedia('(max-width: 800px), (pointer: coarse), (prefers-reduced-motion: reduce)').matches;
 
+    setUseReveal(prefersStableText);
     setDisplayed('');
     setDone(false);
 
+    if (prefersStableText) {
+      setDisplayed(text);
+      setDone(true);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const timeoutId = setTimeout(() => {
       if (cancelled || gen !== generation.current) return;
-
-      if (prefersStableText) {
-        setDisplayed(text);
-        setDone(true);
-        return;
-      }
 
       let i = 0;
       intervalId = setInterval(() => {
@@ -55,7 +60,10 @@ export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
   }, [text, speed, delay]);
 
   return (
-    <span>
+    <span
+      className={useReveal ? 'typewriter-reveal' : undefined}
+      style={{ '--typewriter-delay': `${delay}ms` } as CSSProperties}
+    >
       {displayed}
       {!done && <span className="cursor">▌</span>}
     </span>
