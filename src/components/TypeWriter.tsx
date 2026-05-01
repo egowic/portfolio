@@ -14,28 +14,37 @@ export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
   useEffect(() => {
     generation.current += 1;
     const gen = generation.current;
+    let cancelled = false;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    const timeout = setTimeout(() => {
-      if (gen !== generation.current) return;
-      setDisplayed('');
-      setDone(false);
+    setDisplayed('');
+    setDone(false);
+
+    const timeoutId = setTimeout(() => {
+      if (cancelled || gen !== generation.current) return;
+
       let i = 0;
-      const interval = setInterval(() => {
-        if (gen !== generation.current) {
-          clearInterval(interval);
+      intervalId = setInterval(() => {
+        if (cancelled || gen !== generation.current) {
+          if (intervalId) clearInterval(intervalId);
           return;
         }
+
         i++;
         setDisplayed(text.slice(0, i));
+
         if (i >= text.length) {
-          clearInterval(interval);
+          if (intervalId) clearInterval(intervalId);
           setDone(true);
         }
       }, speed);
-      return () => clearInterval(interval);
     }, delay);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [text, speed, delay]);
 
   return (
