@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import type { CSSProperties } from 'react';
 
 interface Props {
   text: string;
@@ -7,10 +6,16 @@ interface Props {
   delay?: number;
 }
 
+function prefersStableText() {
+  return typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(max-width: 800px), (pointer: coarse), (prefers-reduced-motion: reduce)').matches;
+}
+
 export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
-  const [displayed, setDisplayed] = useState('');
-  const [done, setDone] = useState(false);
-  const [useReveal, setUseReveal] = useState(false);
+  const useReveal = prefersStableText();
+  const [displayed, setDisplayed] = useState(() => useReveal ? text : '');
+  const [done, setDone] = useState(() => useReveal);
   const generation = useRef(0);
 
   useEffect(() => {
@@ -18,22 +23,24 @@ export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
     const gen = generation.current;
     let cancelled = false;
     let intervalId: ReturnType<typeof setInterval> | null = null;
-    const prefersStableText = window.matchMedia('(max-width: 800px), (pointer: coarse), (prefers-reduced-motion: reduce)').matches;
 
-    setUseReveal(prefersStableText);
-    setDisplayed('');
-    setDone(false);
-
-    if (prefersStableText) {
-      setDisplayed(text);
-      setDone(true);
+    if (useReveal) {
+      const stableTextId = setTimeout(() => {
+        if (cancelled || gen !== generation.current) return;
+        setDisplayed(text);
+        setDone(true);
+      }, 0);
       return () => {
         cancelled = true;
+        clearTimeout(stableTextId);
       };
     }
 
     const timeoutId = setTimeout(() => {
       if (cancelled || gen !== generation.current) return;
+
+      setDisplayed('');
+      setDone(false);
 
       let i = 0;
       intervalId = setInterval(() => {
@@ -57,13 +64,10 @@ export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
       clearTimeout(timeoutId);
       if (intervalId) clearInterval(intervalId);
     };
-  }, [text, speed, delay]);
+  }, [text, speed, delay, useReveal]);
 
   return (
-    <span
-      className={useReveal ? 'typewriter-reveal' : undefined}
-      style={{ '--typewriter-delay': `${delay}ms` } as CSSProperties}
-    >
+    <span className={useReveal ? 'typewriter-reveal' : undefined}>
       {displayed}
       {!done && <span className="cursor">▌</span>}
     </span>

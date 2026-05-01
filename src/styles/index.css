@@ -61,10 +61,9 @@ body, #root {
 .cursor { display: inline-block; animation: blink 1s step-end infinite; }
 .typewriter-reveal {
   display: inline-block;
-  opacity: 0;
-  transform: translateY(6px);
-  animation: typewriterReveal 0.55s ease forwards;
-  animation-delay: var(--typewriter-delay, 0ms);
+  opacity: 0.78;
+  transform: translateY(2px);
+  animation: typewriterReveal 0.22s ease-out forwards;
 }
 .fade-up { animation: fadeUp 0.75s ease both; }
 
