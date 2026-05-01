@@ -57,14 +57,15 @@ export default function Hero() {
         </div>
       </div>
 
-      <div
+      <button
+        type="button"
         className="hero-scroll"
         onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
         aria-label="Scroll down"
       >
         <div className="scroll-line" />
         <span>scroll</span>
-      </div>
+      </button>
 
       <div className="aurora-line" aria-hidden="true" />
     </section>

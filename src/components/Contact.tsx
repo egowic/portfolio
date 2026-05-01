@@ -19,14 +19,14 @@ interface FormLabels {
 
 const FORM_LABELS: Record<'en' | 'tr', FormLabels> = {
   en: {
-    name: 'NAME', email: 'EMAIL', message: 'MESSAGE',
-    send: 'Send Message →', sending: 'Sending...',
-    success: "Message sent! I'll get back to you within 24 hours.", error: 'Something went wrong. Try again.',
+    name: 'name', email: 'email', message: 'message',
+    send: 'send message →', sending: 'sending...',
+    success: 'Message sent!', error: 'Something went wrong. Try again.',
   },
   tr: {
-    name: 'İSİM', email: 'E-POSTA', message: 'MESAJ',
-    send: 'Mesaj Gönder →', sending: 'Gönderiliyor...',
-    success: 'Mesaj gönderildi! 24 saat içinde döneceğim.', error: 'Bir hata oluştu. Tekrar deneyin.',
+    name: 'isim', email: 'e-posta', message: 'mesaj',
+    send: 'mesaj gönder →', sending: 'gönderiliyor...',
+    success: 'Mesaj gönderildi!', error: 'Bir hata oluştu. Tekrar deneyin.',
   },
 };
 
@@ -91,19 +91,6 @@ export default function Contact() {
 
           {/* Right: form */}
           <div>
-            {status === 'success' ? (
-              <div style={{
-                background: 'rgba(16,185,129,0.06)',
-                border: '1px solid rgba(16,185,129,0.25)',
-                borderRadius: 12,
-                padding: 40,
-                textAlign: 'center',
-                color: 'var(--text)',
-              }}>
-                <div style={{ fontSize: 40, marginBottom: 16 }}>✓</div>
-                <div style={{ fontWeight: 700, fontSize: 20, marginBottom: 8 }}>{fl.success}</div>
-              </div>
-            ) : (
               <form className="contact-form" onSubmit={handleSubmit} noValidate aria-label="Contact form">
                 <div className="form-row">
                   <div className="form-group">
@@ -173,8 +160,12 @@ export default function Contact() {
                     {fl.error}
                   </span>
                 )}
+                {status === 'success' && (
+                  <span role="status" className="mono" style={{ fontSize: 11, color: '#10b981' }}>
+                    {fl.success}
+                  </span>
+                )}
               </form>
-            )}
           </div>
         </div>
 
