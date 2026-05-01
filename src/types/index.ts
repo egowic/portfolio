@@ -28,7 +28,9 @@ export interface ValidationErrors {
 export interface ExperienceItem {
   role: { en: string; tr: string };
   company: string;
-  period: string | null;
+  period?: string | null;
+  start?: string;
+  current?: boolean;
   loc: { en: string; tr: string };
 }
 
