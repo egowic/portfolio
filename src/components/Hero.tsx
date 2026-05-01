@@ -19,11 +19,6 @@ export default function Hero() {
           <img src={avatarUrl} alt="Ege Bilir" />
         </div>
 
-        <div className="hero-badge">
-          <span className="hero-badge-dot" />
-          {t.heroTag}
-        </div>
-
         <h1 className="hero-name">Ege Bilir</h1>
 
         <p className="hero-role">
