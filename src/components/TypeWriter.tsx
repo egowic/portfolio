@@ -16,12 +16,19 @@ export default function TypeWriter({ text, speed = 50, delay = 300 }: Props) {
     const gen = generation.current;
     let cancelled = false;
     let intervalId: ReturnType<typeof setInterval> | null = null;
+    const prefersStableText = window.matchMedia('(max-width: 800px), (pointer: coarse), (prefers-reduced-motion: reduce)').matches;
 
     setDisplayed('');
     setDone(false);
 
     const timeoutId = setTimeout(() => {
       if (cancelled || gen !== generation.current) return;
+
+      if (prefersStableText) {
+        setDisplayed(text);
+        setDone(true);
+        return;
+      }
 
       let i = 0;
       intervalId = setInterval(() => {

@@ -299,9 +299,38 @@ section { position: relative; z-index: 1; }
 @media (max-width: 800px) {
   .nav-links-desktop { display: none !important; }
   .hamburger { display: flex !important; }
-  .nav-bar { padding: 0 20px; }
+  .nav-bar {
+    padding: 0 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .mobile-menu {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
   .hero-content, .section-inner { padding-left: 24px; padding-right: 24px; }
   .hero-section { min-height: 92vh; }
+  .particle-canvas { opacity: 0.28; }
+  .mesh-orb {
+    filter: blur(52px);
+    animation: none;
+  }
+  .mesh-orb-1 { width: 360px; height: 360px; top: -120px; left: -80px; }
+  .mesh-orb-2 { width: 300px; height: 300px; top: 140px; right: -90px; opacity: 0.65; }
+  .mesh-orb-3 { width: 240px; height: 240px; left: 20%; opacity: 0.45; }
+  .aurora-line,
+  .hero-badge-dot,
+  .scroll-chevron,
+  .cursor { animation: none; }
+  .hero-photo,
+  .fade-up { animation-duration: 0.45s; }
+  .exp-card,
+  .experience-card,
+  .project-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .project-glow { display: none; }
   .about-grid, .contact-grid, .projects-grid, .form-row { grid-template-columns: 1fr; }
   .about-grid, .contact-grid { gap: 44px; }
   .exp-meta { flex-direction: column; align-items: flex-start; }
