@@ -60,7 +60,7 @@ export default function About() {
       <section id="experience" className="exp-section">
         <div className="section-inner">
           <div className="section-label fade-up">{t.expTitle}</div>
-          <h2 className="section-title fade-up">{t.expTitle}</h2>
+          <h2 className="section-title fade-up" style={{ marginBottom: 40 }}>{t.expTitle}</h2>
           <div className="timeline">
             {EXPERIENCE.map((exp, i) => (
               <div key={i} className="timeline-item fade-up">
