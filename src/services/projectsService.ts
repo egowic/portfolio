@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 import type { Project } from '../types';
 
 export async function getProjects(): Promise<Project[]> {
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from('projects')
     .select('*')
