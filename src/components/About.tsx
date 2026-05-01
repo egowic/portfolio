@@ -1,45 +1,86 @@
 import { useLang } from '../context/LangContext';
-import { ACCENT, SKILLS, EXPERIENCE } from '../data';
+import { SKILLS, EXPERIENCE } from '../data';
+
+const SKILL_GROUPS = [
+  { label: 'Languages', skills: ['Java', 'Python', 'JavaScript', 'SQL', 'C#'] },
+  { label: 'Backend & Data', skills: ['REST APIs', 'Backend Dev', 'MongoDB', 'Big Data'] },
+  { label: 'Frontend & Tools', skills: ['HTML/CSS', 'React', 'Git', 'Agile'] },
+];
+
+const ALL_SKILLS = new Set(SKILLS);
+
+function SkillGroups() {
+  const remaining = SKILLS.filter(s => !SKILL_GROUPS.flatMap(g => g.skills).includes(s));
+  const groups = remaining.length > 0
+    ? [...SKILL_GROUPS, { label: 'Other', skills: remaining }]
+    : SKILL_GROUPS;
+
+  return (
+    <>
+      {groups.map(group => (
+        <div key={group.label} className="skills-group">
+          <div className="skills-group-label">{group.label}</div>
+          <div className="skills-pills">
+            {group.skills.filter(s => ALL_SKILLS.has(s)).map(s => (
+              <span key={s} className="skill-pill">{s}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
 
 export default function About() {
   const { t, lang } = useLang();
 
   return (
-    <section
-      id="about"
-      className="section-inner"
-      style={{ padding: '48px 48px 64px', maxWidth: 860, margin: '0 auto' }}
-    >
-      <hr className="divider" style={{ marginBottom: 64 }} />
-      <div className="section-label">{t.s1label}</div>
-      <div className="about-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64 }}>
-        <div>
-          <h2 style={{ fontSize: 32, fontWeight: 300, color: '#f0ece5', marginBottom: 20, letterSpacing: '-0.02em' }}>
-            {t.s1title}
-          </h2>
-          <p style={{ color: '#777', lineHeight: 1.8, fontSize: 14, marginBottom: 16 }}>{t.s1p1}</p>
-          <p style={{ color: '#777', lineHeight: 1.8, fontSize: 14, marginBottom: 16 }}>{t.s1p2}</p>
-          <p style={{ color: '#777', lineHeight: 1.8, fontSize: 14 }}>{t.s1p3}</p>
+    <>
+      {/* About */}
+      <section id="about" className="about-section">
+        <div className="section-inner">
+          <div className="section-label fade-up">{t.s1label}</div>
+          <div className="about-grid">
+            <div className="about-text fade-up">
+              <h2 className="section-title">{t.s1title}</h2>
+              <p>{t.s1p1}</p>
+              <p>{t.s1p2}</p>
+              <p>{t.s1p3}</p>
+            </div>
+            <div className="fade-up">
+              <SkillGroups />
+            </div>
+          </div>
         </div>
-        <div>
-          <h3 style={{ fontSize: 14, color: '#f0ece5', marginBottom: 20, fontWeight: 400 }}>{t.expTitle}</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 40 }}>
+      </section>
+
+      <div className="section-divider" />
+
+      {/* Experience */}
+      <section id="experience" className="exp-section">
+        <div className="section-inner">
+          <div className="section-label fade-up">{t.expTitle}</div>
+          <h2 className="section-title fade-up">{t.expTitle}</h2>
+          <div className="timeline">
             {EXPERIENCE.map((exp, i) => (
-              <div key={i} style={{ borderLeft: '1px solid #222226', paddingLeft: 16 }}>
-                <div style={{ fontSize: 13, color: '#c8c4be', fontWeight: 500 }}>{exp.role[lang]}</div>
-                <div className="mono" style={{ fontSize: 11, color: ACCENT, marginTop: 2 }}>{exp.company}</div>
-                <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>
-                  {exp.period === null ? t.expPresent : exp.period} · {exp.loc[lang]}
+              <div key={i} className="timeline-item fade-up">
+                <div className="timeline-dot" />
+                <div className="exp-card">
+                  <div className="exp-meta">
+                    <div>
+                      <div className="exp-company">{exp.company}</div>
+                      <div className="exp-role">{exp.role[lang]}</div>
+                    </div>
+                    <div className="exp-period">
+                      {exp.period === null ? t.expPresent : exp.period} · {exp.loc[lang]}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-          <h3 style={{ fontSize: 14, color: '#f0ece5', marginBottom: 16, fontWeight: 400 }}>{t.skillTitle}</h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {SKILLS.map(s => <span key={s} className="skill-pill">{s}</span>)}
-          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
