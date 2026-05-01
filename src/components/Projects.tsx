@@ -1,9 +1,72 @@
 import { useState, useEffect } from 'react';
 import { useLang } from '../context/LangContext';
-import { ACCENT } from '../data';
 import { getProjects } from '../services/projectsService';
 import ProjectSkeleton from './ProjectSkeleton';
 import type { Project } from '../types';
+
+const TYPE_COLORS: Record<string, { color: string; borderColor: string; bg: string }> = {
+  default: {
+    color: 'var(--blue)',
+    borderColor: 'rgba(79,142,247,0.25)',
+    bg: 'rgba(79,142,247,0.06)',
+  },
+};
+
+function getTypeStyle(tag: string) {
+  const map: Record<string, { color: string; borderColor: string; bg: string }> = {
+    'MSc Project': { color: 'var(--cyan)', borderColor: 'rgba(0,212,255,0.25)', bg: 'rgba(0,212,255,0.06)' },
+    'Enterprise':  { color: '#a78bfa', borderColor: 'rgba(139,92,246,0.25)', bg: 'rgba(139,92,246,0.06)' },
+    'Internship':  { color: 'var(--blue)', borderColor: 'rgba(79,142,247,0.25)', bg: 'rgba(79,142,247,0.06)' },
+  };
+  return map[tag] ?? TYPE_COLORS.default;
+}
+
+function ProjectCard({ p, lang }: { p: Project; lang: 'en' | 'tr' }) {
+  const tag = lang === 'tr' ? p.tag_tr : p.tag_en;
+  const style = getTypeStyle(p.tag_en);
+
+  return (
+    <article className="project-card">
+      <div
+        className="project-glow"
+        style={{ background: `radial-gradient(circle, ${style.color.replace('var(--blue)', 'rgba(79,142,247,0.2)').replace('var(--cyan)', 'rgba(0,212,255,0.2)')}, transparent)` }}
+      />
+      <div className="project-top">
+        <div
+          className="project-type"
+          style={{ color: style.color, borderColor: style.borderColor, background: style.bg }}
+        >
+          {tag}
+        </div>
+        {p.link ? (
+          <a
+            href={p.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="project-arrow"
+            aria-label={`Visit ${p.title}`}
+          >
+            ↗
+          </a>
+        ) : (
+          <div className="project-arrow" style={{ opacity: 0.3, cursor: 'default' }}>↗</div>
+        )}
+      </div>
+      <div className="project-name">{p.title}</div>
+      <p className="project-desc">{lang === 'tr' ? p.desc_tr : p.desc_en}</p>
+      <div className="project-tags">
+        {(p.tech ?? []).map(tag => (
+          <span key={tag} className="project-tag">{tag}</span>
+        ))}
+      </div>
+      {p.year && (
+        <div style={{ marginTop: 16, fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--text-dim)' }}>
+          {p.year}
+        </div>
+      )}
+    </article>
+  );
+}
 
 export default function Projects() {
   const { t, lang } = useLang();
@@ -28,91 +91,56 @@ export default function Projects() {
   };
 
   return (
-    <section
-      id="projects"
-      className="section-inner"
-      aria-label="Projects"
-      style={{ padding: '48px 48px 64px', maxWidth: 860, margin: '0 auto' }}
-    >
-      <hr className="divider" style={{ marginBottom: 64 }} />
-      <div className="section-label">{t.s2label}</div>
-      <h2 style={{ fontSize: 32, fontWeight: 300, color: '#f0ece5', marginBottom: 24, letterSpacing: '-0.02em' }}>
-        {t.s2title}
-      </h2>
+    <section id="projects" className="projects-section" aria-label="Projects">
+      <div className="section-inner">
+        <div className="projects-header">
+          <div>
+            <div className="section-label fade-up">{t.s2label}</div>
+            <h2 className="section-title fade-up">{t.s2title}</h2>
+          </div>
+        </div>
 
-      {!loading && !error && uniqueTagsEn.length > 1 && (
-        <div role="group" aria-label="Filter projects by category" style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
-          <button
-            className={`filter-btn${activeTagEn === null ? ' active' : ''}`}
-            onClick={() => setActiveTagEn(null)}
-            aria-pressed={activeTagEn === null}
+        {!loading && !error && uniqueTagsEn.length > 1 && (
+          <div
+            role="group"
+            aria-label="Filter projects by category"
+            style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}
           >
-            {t.filterAll}
-          </button>
-          {uniqueTagsEn.map(tagEn => (
             <button
-              key={tagEn}
-              className={`filter-btn${activeTagEn === tagEn ? ' active' : ''}`}
-              onClick={() => setActiveTagEn(prev => prev === tagEn ? null : tagEn)}
-              aria-pressed={activeTagEn === tagEn}
+              className={`filter-btn${activeTagEn === null ? ' active' : ''}`}
+              onClick={() => setActiveTagEn(null)}
+              aria-pressed={activeTagEn === null}
             >
-              {tagLabel(tagEn)}
+              {t.filterAll}
             </button>
+            {uniqueTagsEn.map(tagEn => (
+              <button
+                key={tagEn}
+                className={`filter-btn${activeTagEn === tagEn ? ' active' : ''}`}
+                onClick={() => setActiveTagEn(prev => prev === tagEn ? null : tagEn)}
+                aria-pressed={activeTagEn === tagEn}
+              >
+                {tagLabel(tagEn)}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="projects-grid">
+          {loading && <div style={{ gridColumn: '1/-1' }}><ProjectSkeleton /></div>}
+          {error && (
+            <p
+              className="mono"
+              role="alert"
+              style={{ fontSize: 12, color: '#c0392b', gridColumn: '1/-1' }}
+            >
+              {error}
+            </p>
+          )}
+          {!loading && !error && filtered.map(p => (
+            <ProjectCard key={p.id} p={p} lang={lang} />
           ))}
         </div>
-      )}
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-        {loading && <ProjectSkeleton />}
-        {error && (
-          <p className="mono" role="alert" style={{ fontSize: 12, color: '#c0392b' }}>{error}</p>
-        )}
-        {!loading && !error && filtered.map((p) => (
-          <article
-            key={p.id}
-            className="card-hover project-card"
-            style={{ border: '1px solid #18181c', borderRadius: 8, padding: '28px 32px', background: '#0d0d10' }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-              <div>
-                <span className="mono" style={{ fontSize: 10, color: ACCENT, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                  {lang === 'tr' ? p.tag_tr : p.tag_en}
-                </span>
-                <h3 style={{ fontSize: 20, fontWeight: 400, color: '#f0ece5', marginTop: 6, letterSpacing: '-0.01em' }}>
-                  {p.title}
-                </h3>
-              </div>
-              <span className="mono" style={{ fontSize: 11, color: '#444' }}>{p.year}</span>
-            </div>
-            <p style={{ color: '#666', fontSize: 14, lineHeight: 1.75, marginBottom: 20 }}>
-              {lang === 'tr' ? p.desc_tr : p.desc_en}
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {(p.tech ?? []).map(tag => (
-                  <span
-                    key={tag}
-                    className="mono"
-                    style={{ fontSize: 10, color: '#555', background: '#111114', border: '1px solid #1e1e22', borderRadius: 4, padding: '3px 8px' }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              {p.link && (
-                <a
-                  href={p.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Visit ${p.title} site`}
-                  className="mono project-visit-link"
-                >
-                  {t.visitSite}
-                </a>
-              )}
-            </div>
-          </article>
-        ))}
       </div>
     </section>
   );

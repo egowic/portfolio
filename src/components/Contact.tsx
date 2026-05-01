@@ -1,16 +1,9 @@
 import { useState, useRef } from 'react';
-import type { CSSProperties } from 'react';
 import { useLang } from '../context/LangContext';
-import { ACCENT } from '../data';
 import { LinkedInIcon, GitHubIcon } from './Icons';
 import { submitContact } from '../services/contactsService';
 import { validateContactForm, isValid } from '../utils/validation';
 import type { ContactFormData, ValidationErrors } from '../types';
-
-const CONTACT_ITEMS = [
-  { label: 'email', value: 'ege.bilir@gmail.com', href: 'mailto:ege.bilir@gmail.com' },
-  { label: 'tel', value: '+90 539 606 84 91', href: 'tel:+905396068491' },
-];
 
 type FormStatus = 'idle' | 'sending' | 'success' | 'error';
 
@@ -37,33 +30,6 @@ const FORM_LABELS: Record<'en' | 'tr', FormLabels> = {
   },
 };
 
-const inputStyle: CSSProperties = {
-  background: '#0d0d10',
-  border: '1px solid #1e1e22',
-  borderRadius: 4,
-  padding: '10px 12px',
-  color: '#f0ece5',
-  fontSize: 13,
-  fontFamily: 'inherit',
-  outline: 'none',
-  transition: 'border-color 0.2s',
-};
-
-function SocialLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ color: '#333', transition: 'color 0.2s', display: 'flex' }}
-      onMouseEnter={e => (e.currentTarget.style.color = ACCENT)}
-      onMouseLeave={e => (e.currentTarget.style.color = '#333')}
-    >
-      {children}
-    </a>
-  );
-}
-
 export default function Contact() {
   const { t, lang } = useLang();
   const fl = FORM_LABELS[lang];
@@ -86,10 +52,7 @@ export default function Contact() {
     e.preventDefault();
     if (status === 'sending' || status === 'success' || cooldown) return;
     const errors = validateContactForm(form);
-    if (!isValid(errors)) {
-      setFieldErrors(errors);
-      return;
-    }
+    if (!isValid(errors)) { setFieldErrors(errors); return; }
     setStatus('sending');
     try {
       await submitContact(form);
@@ -99,138 +62,120 @@ export default function Contact() {
     } catch {
       setStatus('error');
       setCooldown(true);
-      cooldownTimer.current = setTimeout(() => {
-        setCooldown(false);
-        setStatus('idle');
-      }, 10000);
+      cooldownTimer.current = setTimeout(() => { setCooldown(false); setStatus('idle'); }, 10000);
     }
   }
 
   const isDisabled = status === 'sending' || status === 'success' || cooldown;
 
   return (
-    <section
-      id="contact"
-      className="section-inner"
-      style={{ padding: '48px 48px 80px', maxWidth: 860, margin: '0 auto' }}
-    >
-      <hr className="divider" style={{ marginBottom: 64 }} />
-      <div className="section-label">{t.s3label}</div>
-      <h2 style={{ fontSize: 32, fontWeight: 300, color: '#f0ece5', marginBottom: 16, letterSpacing: '-0.02em' }}>
-        {t.s3title}
-      </h2>
-      <p style={{ color: '#666', fontSize: 14, lineHeight: 1.75, maxWidth: 460, marginBottom: 48 }}>{t.s3sub}</p>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 48 }}>
-        {CONTACT_ITEMS.map(item => (
-          <div key={item.label} style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
-            <span className="mono" style={{ fontSize: 11, color: '#444', width: 40, flexShrink: 0 }}>{item.label}</span>
-            <a
-              href={item.href}
-              className="contact-link"
-              style={{
-                fontFamily: 'JetBrains Mono, monospace', fontSize: 18, color: '#f0ece5',
-                textDecoration: 'none', borderBottom: '1px solid #222226', paddingBottom: 4,
-                transition: 'color 0.2s, border-color 0.2s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.color = ACCENT; e.currentTarget.style.borderColor = ACCENT; }}
-              onMouseLeave={e => { e.currentTarget.style.color = '#f0ece5'; e.currentTarget.style.borderColor = '#222226'; }}
-            >
-              {item.value}
-            </a>
+    <section id="contact" className="contact-section">
+      <div className="section-inner">
+        <div className="contact-grid">
+          {/* Left: info */}
+          <div>
+            <div className="section-label">{t.s3label}</div>
+            <h2 className="contact-title"><span>{t.s3title}</span></h2>
+            <p className="contact-copy">{t.s3sub}</p>
+            <div className="contact-links">
+              <a href="mailto:ege.bilir@gmail.com" className="contact-link">
+                <div className="contact-link-icon">✉</div>
+                ege.bilir@gmail.com
+              </a>
+              <a href="tel:+905396068491" className="contact-link">
+                <div className="contact-link-icon" style={{ fontSize: 13 }}>☎</div>
+                +90 539 606 84 91
+              </a>
+            </div>
           </div>
-        ))}
-      </div>
 
-      <form
-        onSubmit={handleSubmit}
-        noValidate
-        aria-label="Contact form"
-        style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 480 }}
-      >
-        {(['name', 'email'] as const).map(field => (
-          <div key={field} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label
-              htmlFor={`contact-${field}`}
-              className="mono"
-              style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}
-            >
-              {fl[field]}
-            </label>
-            <input
-              id={`contact-${field}`}
-              type={field === 'email' ? 'email' : 'text'}
-              name={field}
-              value={form[field]}
-              onChange={handleChange}
-              aria-required="true"
-              aria-invalid={!!fieldErrors[field]}
-              aria-describedby={fieldErrors[field] ? `${field}-error` : undefined}
-              style={{ ...inputStyle, borderColor: fieldErrors[field] ? '#c0392b' : '#1e1e22' }}
-              onFocus={e => (e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : ACCENT)}
-              onBlur={e => (e.currentTarget.style.borderColor = fieldErrors[field] ? '#c0392b' : '#1e1e22')}
-            />
-            {fieldErrors[field] && (
-              <span id={`${field}-error`} role="alert" className="mono" style={{ fontSize: 10, color: '#c0392b' }}>
-                {fieldErrors[field]}
-              </span>
-            )}
+          {/* Right: form */}
+          <div>
+              <form className="contact-form" onSubmit={handleSubmit} noValidate aria-label="Contact form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="contact-name" className="form-label">{fl.name}</label>
+                    <input
+                      id="contact-name"
+                      className={`form-input${fieldErrors.name ? ' error' : ''}`}
+                      type="text"
+                      name="name"
+                      value={form.name}
+                      onChange={handleChange}
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.name}
+                    />
+                    {fieldErrors.name && (
+                      <span role="alert" className="mono" style={{ fontSize: 11, color: '#c0392b' }}>
+                        {fieldErrors.name}
+                      </span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="contact-email" className="form-label">{fl.email}</label>
+                    <input
+                      id="contact-email"
+                      className={`form-input${fieldErrors.email ? ' error' : ''}`}
+                      type="email"
+                      name="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      aria-required="true"
+                      aria-invalid={!!fieldErrors.email}
+                    />
+                    {fieldErrors.email && (
+                      <span role="alert" className="mono" style={{ fontSize: 11, color: '#c0392b' }}>
+                        {fieldErrors.email}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="contact-message" className="form-label">{fl.message}</label>
+                  <textarea
+                    id="contact-message"
+                    className={`form-textarea${fieldErrors.message ? ' error' : ''}`}
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    aria-required="true"
+                    aria-invalid={!!fieldErrors.message}
+                  />
+                  {fieldErrors.message && (
+                    <span role="alert" className="mono" style={{ fontSize: 11, color: '#c0392b' }}>
+                      {fieldErrors.message}
+                    </span>
+                  )}
+                </div>
+                <button
+                  type="submit"
+                  className="submit-btn"
+                  disabled={isDisabled}
+                  aria-busy={status === 'sending'}
+                >
+                  {status === 'sending' ? fl.sending : fl.send}
+                </button>
+                {(status === 'error' || cooldown) && (
+                  <span role="alert" className="mono" style={{ fontSize: 11, color: '#c0392b' }}>
+                    {fl.error}
+                  </span>
+                )}
+                {status === 'success' && (
+                  <span role="status" className="mono" style={{ fontSize: 11, color: '#10b981' }}>
+                    {fl.success}
+                  </span>
+                )}
+              </form>
           </div>
-        ))}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <label
-            htmlFor="contact-message"
-            className="mono"
-            style={{ fontSize: 10, color: '#444', letterSpacing: '0.08em' }}
-          >
-            {fl.message}
-          </label>
-          <textarea
-            id="contact-message"
-            name="message"
-            value={form.message}
-            onChange={handleChange}
-            rows={5}
-            aria-required="true"
-            aria-invalid={!!fieldErrors.message}
-            aria-describedby={fieldErrors.message ? 'message-error' : undefined}
-            style={{ ...inputStyle, resize: 'vertical', borderColor: fieldErrors.message ? '#c0392b' : '#1e1e22' }}
-            onFocus={e => (e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : ACCENT)}
-            onBlur={e => (e.currentTarget.style.borderColor = fieldErrors.message ? '#c0392b' : '#1e1e22')}
-          />
-          {fieldErrors.message && (
-            <span id="message-error" role="alert" className="mono" style={{ fontSize: 10, color: '#c0392b' }}>
-              {fieldErrors.message}
-            </span>
-          )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 8 }}>
-          <button
-            type="submit"
-            disabled={isDisabled}
-            className="mono submit-btn"
-            aria-busy={status === 'sending'}
-          >
-            {status === 'sending' ? fl.sending : fl.send}
-          </button>
-          {status === 'success' && (
-            <span role="status" className="mono" style={{ fontSize: 11, color: '#4caf50' }}>{fl.success}</span>
-          )}
-          {(status === 'error' || cooldown) && (
-            <span role="alert" className="mono" style={{ fontSize: 11, color: '#c0392b' }}>{fl.error}</span>
-          )}
-        </div>
-      </form>
-
-      <div
-        className="footer-row"
-        style={{ marginTop: 100, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-      >
-        <span className="mono" style={{ fontSize: 11, color: '#555' }}>{t.footer}</span>
-        <div style={{ display: 'flex', gap: 16 }}>
-          <SocialLink href="https://www.linkedin.com/in/ege-bilir-b17413158/"><LinkedInIcon /></SocialLink>
-          <SocialLink href="https://github.com/egowic"><GitHubIcon /></SocialLink>
+        {/* Footer */}
+        <div className="footer-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span className="footer-copy">{t.footer}</span>
+          <div className="footer-links">
+            <a href="https://github.com/egowic" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><GitHubIcon /></a>
+            <a href="https://www.linkedin.com/in/ege-bilir-b17413158/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><LinkedInIcon /></a>
+          </div>
         </div>
       </div>
     </section>

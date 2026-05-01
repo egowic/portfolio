@@ -1,6 +1,7 @@
 import type { ExperienceItem, Translation } from '../types';
 
-export const ACCENT = '#3a7bd5';
+export const ACCENT = '#4f8ef7';
+export const CYAN = '#00d4ff';
 
 export const SKILLS: string[] = [
   'Java', 'Python', 'JavaScript', 'SQL', 'MongoDB',
